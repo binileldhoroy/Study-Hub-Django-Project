@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Q
 from django.contrib.auth.models import User
 from .models import Room,Topic,Message
-from .forms import RoomForm
+from .forms import RoomForm,UserForm
 # Create your views here.
 
 def loginView(request):
@@ -109,8 +109,7 @@ def createRoom(request):
             topic = topic,
             name = request.POST.get('name'),
             description = request.POST.get('description'),
-
-        )
+            )
         # form = RoomForm(request.POST)
         # if form.is_valid():
         #     room = form.save(commit=False)
@@ -118,7 +117,8 @@ def createRoom(request):
         #     room.save()
         return redirect('home')
 
-    return render(request,'base/room_form.html',{'form':form},{'topics':topics})
+
+    return render(request,'base/room_form.html',{'form':form,'topics':topics})
 
 @login_required(login_url='login')
 def updateRoom(request,pkey):
@@ -140,9 +140,9 @@ def updateRoom(request,pkey):
         return redirect('home')
 
     return render(request,'base/room_form.html',
-    {'form':form},
-    {'topics':topics},
-    {'room':room}
+    {'form':form,
+    'topics':topics,
+    'room':room}
     )
 
 @login_required(login_url='login')
@@ -171,3 +171,14 @@ def deleteMessage(request,pkey):
 
     return render(request,'base/delete.html',{'obj':message})
 
+
+@login_required(login_url='login')
+def updateUser(request):
+    user = request.user
+    form = UserForm(instance=user)
+    if request.method == 'POST':
+        form = UserForm(request.POST,instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('user-profile',pkey=user.id)
+    return render(request,'base/update_user.html',{'form':form})
