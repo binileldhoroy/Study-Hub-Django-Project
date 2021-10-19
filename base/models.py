@@ -37,7 +37,8 @@ class Message(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     body = models.TextField()
     update = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True) 
+    created = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(blank=True, null=True)
 
     class Meta:
         ordering = ['-update','-created']

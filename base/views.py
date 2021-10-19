@@ -60,10 +60,13 @@ def home(request):
         )
     topics = Topic.objects.all()[0:5]
     room_count = rooms.count()
+    room_messages = Message.objects.filter(
+        Q(room__topic__name__icontains=q))[0:3]
     return render(request,'base/home.html',{
         'rooms':rooms,
         'topics':topics,
-        'room_count':room_count 
+        'room_count':room_count ,
+        'room_messages':room_messages
         })
 
 @login_required(login_url='login')
@@ -91,8 +94,8 @@ def userProfile(request,pkey):
     user = User.objects.get(id=pkey)
     rooms = user.room_set.all()
     topics = Topic.objects.all()
-    # room_message = user.message_set()
-    context = {'user':user,'rooms':rooms,"topics":topics}
+    room_messages = user.message_set.all()[0:5]
+    context = {'user':user,'rooms':rooms,"topics":topics,'room_messages':room_messages}
     return render(request,'base/profile.html',context)
 
 @login_required(login_url='login')
@@ -186,3 +189,7 @@ def topicPage(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     topics = Topic.objects.filter(name__icontains=q)
     return render(request,'base/topics.html',{'topics':topics})
+
+# def activityPage(request):
+#     room_messages = Message.objects.all()
+#     return render(request,'base/activity_page.html',{'room_messages':room_messages})
